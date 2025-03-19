@@ -15,9 +15,6 @@ const light = new THREE.PointLight(0xffffff, 1, 100);
 light.position.set(10, 10, 10);
 scene.add(light);
 
-// Dodanie tła (opcjonalne)
-scene.background = new THREE.Color(0xeeeeee);
-
 // Tworzenie loadera dla pliku .obj
 const loader = new OBJLoader();
 
