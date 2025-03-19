@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8">
-		<title>BSP SHAD</title>
+  <head>
+    <meta charset="utf-8">
+    <title>BSP SHAD</title>
 
-		<link rel="stylesheet" href="public/index.css">
+    <link rel="stylesheet" href="public/index.css">
 
     <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
     <script type="importmap">
@@ -15,8 +15,31 @@
         }
       }
     </script>
-	</head>
-	<body>
+
+    <style>
+      /* Stylizacja przycisku w prawym górnym rogu */
+      .back-button {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background-color: white;
+        color: black;
+        border: 2px solid black;
+        padding: 10px 20px;
+        font-size: 16px;
+        display: flex;
+        align-items: center;
+        cursor: pointer;
+        text-decoration: none;
+      }
+
+      .back-button i {
+        margin-right: 10px;
+        font-size: 20px;
+      }
+    </style>
+  </head>
+  <body>
     <div id="heading">
       <h1>BSP SHAD</h1>
       <div class="border"></div>
@@ -24,6 +47,12 @@
     <div id="progress-container">
       <div id="progress">Przygotuj się do lotu...</div>
     </div>
-		<script type="module" src="./main.js"></script>
-	</body>
+
+    <!-- Przycisk Powrót w prawym górnym rogu -->
+    <a href="https://tyszecki.github.io/SHAD-WEBSITE/index.html#" class="back-button">
+      <i class="fa fa-arrow-left"></i> Powrót
+    </a>
+
+    <script type="module" src="./main.js"></script>
+  </body>
 </html>
