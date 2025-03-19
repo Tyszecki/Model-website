@@ -47,8 +47,8 @@ spotLight.castShadow = true;
 spotLight.shadow.bias = -0.0001;
 scene.add(spotLight);
 
-const loader = new GLTFLoader().setPath('public/millennium_falcon/');
-loader.load('scene.gltf', (gltf) => {
+const loader = new GLTFLoader().setPath('public/millennium_falcon/'); // Ścieżka do folderu z plikiem .glb
+loader.load('dron.glb', (gltf) => { // Zmieniamy 'scene.gltf' na 'dron.glb'
   console.log('loading model');
   const mesh = gltf.scene;
 
