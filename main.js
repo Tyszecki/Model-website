@@ -4,12 +4,17 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 // Pobierz kontener sceny
 const sceneContainer = document.getElementById('scene-container');
+if (!sceneContainer) {
+  console.error('Kontener sceny (#scene-container) nie został znaleziony!');
+} else {
+  console.log('Kontener sceny został znaleziony.');
+}
 
 // Utwórz renderer i podłącz go do kontenera
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight); // Dopasuj rozmiar do kontenera
-renderer.setClearColor(0x000000);
+renderer.setClearColor(0x000000); // Tło sceny na czarno
 renderer.setPixelRatio(window.devicePixelRatio);
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
