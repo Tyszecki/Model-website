@@ -66,7 +66,7 @@ loader.load('dron.glb', (gltf) => {
   // Wymuś skalowanie modelu
   const targetSize = 2; // Docelowy rozmiar (np. 2 jednostki)
   const maxDimension = Math.max(size.x, size.y, size.z);
-  const scale = targetSize / maxDimension;
+  const scale = (targetSize / maxDimension) * 5; // Powiększ 5-krotnie
   model.scale.set(scale, scale, scale);
 
   // Debugowanie: Wyświetl nowy rozmiar modelu
