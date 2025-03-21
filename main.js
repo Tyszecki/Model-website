@@ -2,29 +2,21 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-// Pobierz kontener sceny
-const sceneContainer = document.getElementById('scene-container');
-if (!sceneContainer) {
-  console.error('Kontener sceny (#scene-container) nie został znaleziony!');
-} else {
-  console.log('Kontener sceny został znaleziony.');
-}
-
-// Utwórz renderer i podłącz go do kontenera
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight); // Dopasuj rozmiar do kontenera
-renderer.setClearColor(0x000000); // Tło sceny na czarno
+
+renderer.setSize(window.innerWidth, window.innerHeight); // Pełny ekran
+renderer.setClearColor(0x000000);
 renderer.setPixelRatio(window.devicePixelRatio);
+
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-// Dodaj renderer do kontenera
-sceneContainer.appendChild(renderer.domElement);
+document.body.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
 
-const camera = new THREE.PerspectiveCamera(45, sceneContainer.clientWidth / sceneContainer.clientHeight, 1, 1000);
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
 camera.position.set(10, 10, 10); // Dostosuj pozycję kamery
 
 const controls = new OrbitControls(camera, renderer.domElement);
@@ -107,9 +99,9 @@ loader.load('dron.glb', (gltf) => {
 });
 
 window.addEventListener('resize', () => {
-  camera.aspect = sceneContainer.clientWidth / sceneContainer.clientHeight;
+  camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
-  renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
+  renderer.setSize(window.innerWidth, window.innerHeight);
 });
 
 function animate() {
