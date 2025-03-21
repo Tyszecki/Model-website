@@ -57,13 +57,13 @@ loader.load('dron.glb', (gltf) => {
 
   const model = gltf.scene;
 
-  // Normalizuj skalę modelu
-  const bbox = new THREE.Box3().setFromObject(model);
-  const size = new THREE.Vector3();
-  bbox.getSize(size); // Pobierz rozmiar modelu
-  const maxSize = Math.max(size.x, size.y, size.z); // Największy wymiar
-  const scale = 1.0 / maxSize; // Skala normalizująca
-  model.scale.set(scale, scale, scale);
+  // Zresetuj transformacje modelu
+  model.position.set(0, 0, 0);
+  model.rotation.set(0, 0, 0);
+  model.scale.set(1, 1, 1);
+
+  // Ręcznie ustaw skalę modelu
+  model.scale.set(0.1, 0.1, 0.1); // Przykładowa skala
 
   model.traverse((child) => {
     if (child.isMesh) {
