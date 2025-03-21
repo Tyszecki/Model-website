@@ -57,7 +57,7 @@ loader.load('dron.glb', (gltf) => {
 
   const model = gltf.scene;
 
-  // Zresetuj transformacje modelu
+  // Zresetuj transformacje modelu (na wszelki wypadek)
   model.position.set(0, 0, 0);
   model.rotation.set(0, 0, 0);
   model.scale.set(1, 1, 1);
@@ -87,7 +87,7 @@ loader.load('dron.glb', (gltf) => {
     }
   });
 
-  model.position.set(0, 1.05, -1);
+  model.position.set(0, 2.5, -1); // Podnieś model wyżej
   scene.add(model);
 
   document.getElementById('progress-container').style.display = 'none';
