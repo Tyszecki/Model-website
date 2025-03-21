@@ -30,20 +30,6 @@ controls.autoRotate = false;
 controls.target = new THREE.Vector3(0, 1, 0);
 controls.update();
 
-const groundGeometry = new THREE.PlaneGeometry(20, 20, 32, 32);
-groundGeometry.rotateX(-Math.PI / 2);
-const groundMaterial = new THREE.MeshStandardMaterial({
-  color: 0x555555,
-  side: THREE.DoubleSide
-});
-const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
-groundMesh.castShadow = false;
-groundMesh.receiveShadow = true;
-groundMesh.position.set(0, -1, 0); // Przesuń stół w dół
-scene.add(groundMesh);
-
-console.log('Pozycja stołu:', groundMesh.position); // Debugowanie: pozycja stołu
-
 const spotLight = new THREE.SpotLight(0xffffff, 3000, 100, 0.22, 1);
 spotLight.position.set(0, 25, 0);
 spotLight.castShadow = true;
@@ -90,7 +76,7 @@ loader.load('dron.glb', (gltf) => {
     }
   });
 
-  model.position.set(0, 3.0, -1); // Podnieś model wyżej
+  model.position.set(0, 1.05, -1); // Ustaw pozycję modelu
   scene.add(model);
 
   console.log('Model:', model); // Debugowanie: model
