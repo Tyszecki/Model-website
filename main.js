@@ -39,6 +39,7 @@ const groundMaterial = new THREE.MeshStandardMaterial({
 const groundMesh = new THREE.Mesh(groundGeometry, groundMaterial);
 groundMesh.castShadow = false;
 groundMesh.receiveShadow = true;
+groundMesh.position.set(0, -1, 0); // Przesuń stół w dół
 scene.add(groundMesh);
 
 const spotLight = new THREE.SpotLight(0xffffff, 3000, 100, 0.22, 1);
@@ -87,7 +88,7 @@ loader.load('dron.glb', (gltf) => {
     }
   });
 
-  model.position.set(0, 2.5, -1); // Podnieś model wyżej
+  model.position.set(0, 3.0, -1); // Podnieś model wyżej
   scene.add(model);
 
   document.getElementById('progress-container').style.display = 'none';
