@@ -57,11 +57,16 @@ loader.load('dron.glb', (gltf) => {
 
   const model = gltf.scene;
 
+  // Zresetuj transformacje modelu
+  model.position.set(0, 0, 0);
+  model.rotation.set(0, 0, 0);
+  model.scale.set(1, 1, 1);
+
   // Debugowanie: Wyświetl rozmiar modelu
   const bbox = new THREE.Box3().setFromObject(model);
   const size = new THREE.Vector3();
   bbox.getSize(size);
-  console.log('Rozmiar modelu:', size);
+  console.log('Rozmiar modelu przed skalowaniem:', size);
 
   // Wymuś skalowanie modelu
   const targetSize = 2; // Docelowy rozmiar (np. 2 jednostki)
