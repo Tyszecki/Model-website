@@ -42,6 +42,8 @@ groundMesh.receiveShadow = true;
 groundMesh.position.set(0, -1, 0); // Przesuń stół w dół
 scene.add(groundMesh);
 
+console.log('Pozycja stołu:', groundMesh.position); // Debugowanie: pozycja stołu
+
 const spotLight = new THREE.SpotLight(0xffffff, 3000, 100, 0.22, 1);
 spotLight.position.set(0, 25, 0);
 spotLight.castShadow = true;
@@ -90,6 +92,10 @@ loader.load('dron.glb', (gltf) => {
 
   model.position.set(0, 3.0, -1); // Podnieś model wyżej
   scene.add(model);
+
+  console.log('Model:', model); // Debugowanie: model
+  console.log('Pozycja modelu:', model.position); // Debugowanie: pozycja modelu
+  console.log('Skala modelu:', model.scale); // Debugowanie: skala modelu
 
   document.getElementById('progress-container').style.display = 'none';
 }, (xhr) => {
