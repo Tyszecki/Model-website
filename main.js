@@ -66,7 +66,7 @@ loader.load('dron.glb', (gltf) => {
   });
 
   model.position.set(0, 1.05, -1);
-  model.scale.set(0.5, 0.5, 0.5); // Dostosuj skalę
+  model.scale.set(0.1, 0.1, 0.1); // Dostosuj skalę
   scene.add(model);
 
   document.getElementById('progress-container').style.display = 'none';
