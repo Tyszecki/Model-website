@@ -22,8 +22,8 @@ camera.position.set(10, 10, 10); // Dostosuj pozycję kamery
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.enablePan = false;
-controls.minDistance = 5;
-controls.maxDistance = 20;
+controls.minDistance = 1; // Minimalna odległość kamery
+controls.maxDistance = Infinity; // Brak maksymalnej odległości
 controls.minPolarAngle = 0; // Pełny obrót wokół osi Y (od dołu)
 controls.maxPolarAngle = Math.PI; // Pełny obrót wokół osi Y (od góry)
 controls.autoRotate = false;
@@ -31,10 +31,15 @@ controls.target = new THREE.Vector3(0, 1, 0);
 controls.update();
 
 const spotLight = new THREE.SpotLight(0xffffff, 3000, 100, 0.22, 1);
-spotLight.position.set(0, 25, 0);
+spotLight.position.set(0, 25, 0); // Światło nad modelem
 spotLight.castShadow = true;
 spotLight.shadow.bias = -0.0001;
 scene.add(spotLight);
+
+const bottomLight = new THREE.SpotLight(0xffffff, 1000, 100, 0.22, 1);
+bottomLight.position.set(0, -10, 0); // Światło pod modelem
+bottomLight.castShadow = true;
+scene.add(bottomLight);
 
 const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Dodaj światło otoczenia
 scene.add(ambientLight);
@@ -76,7 +81,7 @@ loader.load('dron.glb', (gltf) => {
     }
   });
 
-  model.position.set(0, 1.05, -1); // Ustaw pozycję modelu
+  model.position.set(0, 2.0, -1); // Przesuń model wyżej
   scene.add(model);
 
   console.log('Model:', model); // Debugowanie: model
