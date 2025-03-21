@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'; // Importujemy GLTFLoader
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -17,7 +17,7 @@ document.body.appendChild(renderer.domElement);
 const scene = new THREE.Scene();
 
 const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-camera.position.set(4, 5, 11);
+camera.position.set(10, 10, 10); // Dostosuj pozycję kamery
 
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
@@ -47,11 +47,13 @@ spotLight.castShadow = true;
 spotLight.shadow.bias = -0.0001;
 scene.add(spotLight);
 
-// Używamy GLTFLoader do ładowania pliku .glb
+const ambientLight = new THREE.AmbientLight(0xffffff, 1); // Dodaj światło otoczenia
+scene.add(ambientLight);
+
 const loader = new GLTFLoader();
-loader.setPath('public/millennium_falcon/'); // Ustaw ścieżkę do folderu z modelem
-loader.load('dron.glb', (gltf) => { // Ładujemy plik dron.glb
-  console.log('Ładowanie modelu...');
+loader.setPath('public/millennium_falcon/');
+loader.load('dron.glb', (gltf) => {
+  console.log('Model załadowany pomyślnie!');
 
   const model = gltf.scene;
 
@@ -59,16 +61,17 @@ loader.load('dron.glb', (gltf) => { // Ładujemy plik dron.glb
     if (child.isMesh) {
       child.castShadow = true;
       child.receiveShadow = true;
+      child.material = new THREE.MeshStandardMaterial({ color: 0xffffff }); // Tymczasowy materiał
     }
   });
 
   model.position.set(0, 1.05, -1);
-  model.scale.set(1, 1, 1); // Dostosuj skalę, jeśli to konieczne
+  model.scale.set(1, 1, 1); // Dostosuj skalę
   scene.add(model);
 
   document.getElementById('progress-container').style.display = 'none';
 }, (xhr) => {
-  console.log(`Załadowano ${(xhr.loaded / xhr.total * 100).toFixed(2)}%`);
+  console.log(`Postęp ładowania: ${(xhr.loaded / xhr.total * 100).toFixed(2)}%`);
 }, (error) => {
   console.error('Błąd podczas ładowania modelu:', error);
 });
