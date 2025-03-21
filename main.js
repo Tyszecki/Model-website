@@ -57,6 +57,14 @@ loader.load('dron.glb', (gltf) => {
 
   const model = gltf.scene;
 
+  // Normalizuj skalę modelu
+  const bbox = new THREE.Box3().setFromObject(model);
+  const size = new THREE.Vector3();
+  bbox.getSize(size); // Pobierz rozmiar modelu
+  const maxSize = Math.max(size.x, size.y, size.z); // Największy wymiar
+  const scale = 1.0 / maxSize; // Skala normalizująca
+  model.scale.set(scale, scale, scale);
+
   model.traverse((child) => {
     if (child.isMesh) {
       child.castShadow = true;
@@ -66,7 +74,6 @@ loader.load('dron.glb', (gltf) => {
   });
 
   model.position.set(0, 1.05, -1);
-  model.scale.set(0.001, 0.001, 0.001); // Dostosuj skalę
   scene.add(model);
 
   document.getElementById('progress-container').style.display = 'none';
