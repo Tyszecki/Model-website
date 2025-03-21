@@ -72,13 +72,16 @@
         border-radius: 5px;
       }
 
-      #heading h1 {
-        color: black; /* Ustawienie koloru tekstu na czarny */
-        margin: 0; /* Usunięcie domyślnych marginesów */
-        padding: 0; /* Usunięcie domyślnych paddingów */
-        font-size: 24px; /* Możesz dostosować rozmiar czcionki */
-        font-weight: bold; /* Pogrubienie tekstu */
-      }
+#heading h1 {
+  color: black; /* Kolor tekstu */
+  margin: 0; /* Usunięcie domyślnych marginesów */
+  padding: 10px; /* Dodanie paddingu, aby tekst nie stykał się z ramką */
+  font-size: 24px; /* Rozmiar czcionki */
+  font-weight: bold; /* Pogrubienie tekstu */
+  border: 2px solid black; /* Czarna ramka o grubości 2px */
+  border-radius: 5px; /* Zaokrąglenie rogów ramki */
+  display: inline-block; /* Ramka dopasowana do rozmiaru tekstu */
+}
 
       /* Stylizacja kontenera postępu ładowania */
       #progress-container {
