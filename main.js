@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'; // Importujemy GLTFLoader
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const renderer = new THREE.WebGLRenderer({ antialias: true });
@@ -47,26 +47,30 @@ spotLight.castShadow = true;
 spotLight.shadow.bias = -0.0001;
 scene.add(spotLight);
 
-const loader = new GLTFLoader().setPath('public/millennium_falcon/');
-loader.load('scene.gltf', (gltf) => {
-  console.log('loading model');
-  const mesh = gltf.scene;
+// Używamy GLTFLoader do ładowania pliku .glb
+const loader = new GLTFLoader();
+loader.setPath('public/millennium_falcon/'); // Ustaw ścieżkę do folderu z modelem
+loader.load('dron.glb', (gltf) => { // Ładujemy plik dron.glb
+  console.log('Ładowanie modelu...');
 
-  mesh.traverse((child) => {
+  const model = gltf.scene;
+
+  model.traverse((child) => {
     if (child.isMesh) {
       child.castShadow = true;
       child.receiveShadow = true;
     }
   });
 
-  mesh.position.set(0, 1.05, -1);
-  scene.add(mesh);
+  model.position.set(0, 1.05, -1);
+  model.scale.set(1, 1, 1); // Dostosuj skalę, jeśli to konieczne
+  scene.add(model);
 
   document.getElementById('progress-container').style.display = 'none';
 }, (xhr) => {
-  console.log(`loading ${xhr.loaded / xhr.total * 100}%`);
+  console.log(`Załadowano ${(xhr.loaded / xhr.total * 100).toFixed(2)}%`);
 }, (error) => {
-  console.error(error);
+  console.error('Błąd podczas ładowania modelu:', error);
 });
 
 window.addEventListener('resize', () => {
