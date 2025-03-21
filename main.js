@@ -77,7 +77,10 @@ loader.load('dron.glb', (gltf) => {
     if (child.isMesh) {
       child.castShadow = true;
       child.receiveShadow = true;
-      child.material = new THREE.MeshStandardMaterial({ color: 0xffffff }); // Tymczasowy materiał
+      child.material = new THREE.MeshStandardMaterial({ 
+        color: 0xffffff,
+        side: THREE.DoubleSide // Ustaw materiał na dwustronny
+      });
     }
   });
 
