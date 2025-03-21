@@ -24,8 +24,8 @@ controls.enableDamping = true;
 controls.enablePan = false;
 controls.minDistance = 5;
 controls.maxDistance = 20;
-controls.minPolarAngle = 0.5;
-controls.maxPolarAngle = 1.5;
+controls.minPolarAngle = 0; // Pełny obrót wokół osi Y (od dołu)
+controls.maxPolarAngle = Math.PI; // Pełny obrót wokół osi Y (od góry)
 controls.autoRotate = false;
 controls.target = new THREE.Vector3(0, 1, 0);
 controls.update();
