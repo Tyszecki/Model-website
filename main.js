@@ -50,7 +50,7 @@ textureLoader.load('images/logo_shad_bckg.png', function(texture) {
     });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = -Math.PI / 2;
-    plane.position.y = -20; // Bardzo nisko - jak w logo Batmana
+    plane.position.y = -60; // wysokosc plaszczyzny
     plane.receiveShadow = true;
     scene.add(plane);
 });
