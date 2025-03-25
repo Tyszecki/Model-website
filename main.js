@@ -20,6 +20,10 @@ camera.position.set(0, 10, 30);
 // Kontrola kamery (bez zmian)
 let isDragging = false;
 let previousMousePosition = { x: 0, y: 0 };
+const zoomSpeed = 0.05; // Dostosowana wartość (oryginalnie 0.02)
+let zoomLevel = 30;
+const minZoom = 5;  // Nowe ograniczenia
+const maxZoom = 50;
 
 // Płaszczyzna podłogi (bez zmian)
 const textureLoader = new THREE.TextureLoader();
@@ -99,70 +103,86 @@ window.addEventListener('mousemove', (e) => {
     previousMousePosition = { x: e.clientX, y: e.clientY };
 });
 
-// POPRAWIONA OBSŁUGA ZOOMU (TYLKO TE CZĘŚCI ZMIENIAMY):
+// POPRAWIONA OBSŁUGA ZOOMU:
 
-// 1. Zoom scroll (PC) - większa czułość
+// 1. Zoom scroll (PC) - optymalizacja
 sceneContainer.addEventListener('wheel', (e) => {
     e.preventDefault();
     
+    // Płynniejszy zoom z nieliniową czułością
+    const baseSpeed = 0.05;
+    const acceleratedSpeed = baseSpeed * (1 + Math.abs(e.deltaY) / 100);
+    const zoomFactor = e.deltaY * acceleratedSpeed;
+    
+    // Ograniczenie zoomu
+    zoomLevel -= zoomFactor;
+    zoomLevel = Math.max(minZoom, Math.min(maxZoom, zoomLevel));
+    
     const direction = new THREE.Vector3();
     camera.getWorldDirection(direction);
-    
-    // Nowa implementacja zoomu - 3x bardziej czuła
-    const zoomFactor = e.deltaY * 0.1; // Zwiększona czułość (było 0.02)
-    
-    // Płynny zoom z zachowaniem ograniczeń
-    const minDistance = 5;
-    const maxDistance = 50;
-    const target = new THREE.Vector3(0, 5, 0);
-    const currentDistance = camera.position.distanceTo(target);
-    
-    // Oblicz nową odległość
-    let newDistance = currentDistance - zoomFactor;
-    newDistance = Math.max(minDistance, Math.min(maxDistance, newDistance));
-    
-    // Ustaw nową pozycję kamery
-    camera.position.sub(target).normalize().multiplyScalar(newDistance).add(target);
-    camera.lookAt(target);
+    camera.position.add(direction.multiplyScalar(zoomFactor * 0.5)); // Zmniejszony efekt
 }, { passive: false });
 
-// 2. Zoom na telefonie - większa czułość
-let initialPinchDistance = 0;
+// 2. Obsługa touch (mobile) - pełna funkcjonalność
+let touchStartDistance = 0;
+let isTouchDragging = false;
+let previousTouchPosition = { x: 0, y: 0 };
 
 sceneContainer.addEventListener('touchstart', (e) => {
-    if (e.touches.length === 2) {
-        initialPinchDistance = Math.hypot(
+    if (e.touches.length === 1) {
+        isTouchDragging = true;
+        previousTouchPosition = {
+            x: e.touches[0].clientX,
+            y: e.touches[0].clientY
+        };
+        e.preventDefault();
+    } else if (e.touches.length === 2) {
+        touchStartDistance = Math.hypot(
             e.touches[0].clientX - e.touches[1].clientX,
             e.touches[0].clientY - e.touches[1].clientY
         );
+        e.preventDefault();
     }
+}, { passive: false });
+
+window.addEventListener('touchend', () => {
+    isTouchDragging = false;
+    touchStartDistance = 0;
 });
 
 sceneContainer.addEventListener('touchmove', (e) => {
-    if (e.touches.length === 2) {
+    if (isTouchDragging && e.touches.length === 1) {
+        // Obracanie
+        const deltaMove = {
+            x: e.touches[0].clientX - previousTouchPosition.x,
+            y: e.touches[0].clientY - previousTouchPosition.y
+        };
+        
+        camera.position.x -= deltaMove.x * 0.05;
+        camera.position.y += deltaMove.y * 0.05;
+        camera.lookAt(0, 5, 0);
+        
+        previousTouchPosition = {
+            x: e.touches[0].clientX,
+            y: e.touches[0].clientY
+        };
+        e.preventDefault();
+    } else if (e.touches.length === 2) {
+        // Zoom (pinch-to-zoom)
         const currentDistance = Math.hypot(
             e.touches[0].clientX - e.touches[1].clientX,
             e.touches[0].clientY - e.touches[1].clientY
         );
         
-        // 5x większa czułość niż wcześniej
-        const zoomFactor = (initialPinchDistance - currentDistance) * 0.1;
+        const zoomFactor = (touchStartDistance - currentDistance) * 0.05;
+        zoomLevel -= zoomFactor;
+        zoomLevel = Math.max(minZoom, Math.min(maxZoom, zoomLevel));
         
         const direction = new THREE.Vector3();
         camera.getWorldDirection(direction);
+        camera.position.add(direction.multiplyScalar(zoomFactor * 0.3));
         
-        // Płynny zoom z ograniczeniami
-        const minDistance = 5;
-        const maxDistance = 50;
-        const target = new THREE.Vector3(0, 5, 0);
-        const currentCamDistance = camera.position.distanceTo(target);
-        let newDistance = currentCamDistance - zoomFactor;
-        newDistance = Math.max(minDistance, Math.min(maxDistance, newDistance));
-        
-        camera.position.sub(target).normalize().multiplyScalar(newDistance).add(target);
-        camera.lookAt(target);
-        
-        initialPinchDistance = currentDistance;
+        touchStartDistance = currentDistance;
         e.preventDefault();
     }
 }, { passive: false });
