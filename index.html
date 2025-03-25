@@ -3,6 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>BSP SHAD</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="public/index.css">
     <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
     <script type="importmap">
@@ -17,17 +18,33 @@
         html, body {
             margin: 0;
             padding: 0;
-            overflow: hidden;
             width: 100%;
             height: 100%;
+            overflow: hidden;
+            touch-action: none;
         }
         #scene-container {
-            position: absolute;
+            position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: #f0f0f0;
+            z-index: 1;
+        }
+        #heading {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            font-family: 'Arial Black', Gadget, sans-serif;
+            font-weight: 900;
+            font-size: 28px;
+            color: #000;
+            text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
+            background-color: rgba(255, 255, 255, 0.85);
+            padding: 12px 20px;
+            border-radius: 8px;
+            border: 2px solid #000;
+            z-index: 2;
         }
         #progress-container {
             position: fixed;
@@ -40,29 +57,14 @@
             background-color: rgba(0, 0, 0, 0.7);
             padding: 10px 20px;
             border-radius: 5px;
-            z-index: 1000;
-        }
-        #heading {
-            position: fixed;
-            top: 20px;
-            left: 20px;
-            z-index: 1000;
-            font-family: 'Arial Black', sans-serif;
-            font-weight: 900;
-            font-size: 28px;
-            color: #000;
-            text-shadow: 1px 1px 3px rgba(255,255,255,0.8);
-            background-color: rgba(255, 255, 255, 0.85);
-            padding: 12px 20px;
-            border-radius: 8px;
-            border: 2px solid #000;
+            z-index: 3;
         }
     </style>
 </head>
 <body>
     <div id="heading">BSP SHAD</div>
     <div id="progress-container">
-        <div id="progress">Przygotuj się do lotu...</div>
+        <div id="progress">Ładowanie modelu...</div>
     </div>
     <div id="scene-container"></div>
     <script type="module" src="./main.js"></script>
