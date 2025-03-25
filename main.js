@@ -4,11 +4,10 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 // Inicjalizacja sceny
 const sceneContainer = document.getElementById('scene-container');
 const renderer = new THREE.WebGLRenderer({ 
-    antialias: true,
-    powerPreference: "high-performance"
+    antialias: true
 });
 renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
-renderer.setClearColor(0x000000);
+renderer.setClearColor(0x000000); // Czarne tło
 renderer.shadowMap.enabled = true;
 sceneContainer.appendChild(renderer.domElement);
 
@@ -16,38 +15,42 @@ const scene = new THREE.Scene();
 
 // Kamera
 const camera = new THREE.PerspectiveCamera(45, sceneContainer.clientWidth / sceneContainer.clientHeight, 0.1, 1000);
-camera.position.set(0, 5, 20);
+camera.position.set(0, 10, 30);
 
 // Kontrola kamery
 let isDragging = false;
 let previousMousePosition = { x: 0, y: 0 };
-let zoomLevel = 20;
-const minZoom = 5;
+const zoomSpeed = 0.1;
+let zoomLevel = 30;
+const minZoom = 10;
 const maxZoom = 50;
 
-// Płaszczyzna podłogi z logo
+// Płaszczyzna podłogi z logo (TERAZ WIDOCZNA)
 const textureLoader = new THREE.TextureLoader();
 textureLoader.load('public/logo_shad_bckg.png', (texture) => {
-    const floorGeometry = new THREE.PlaneGeometry(30, 30);
-    const floorMaterial = new THREE.MeshStandardMaterial({
+    texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    const planeGeometry = new THREE.PlaneGeometry(30, 30);
+    const planeMaterial = new THREE.MeshStandardMaterial({
         map: texture,
-        transparent: true,
-        opacity: 0.8,
+        side: THREE.DoubleSide,
         metalness: 0.3,
         roughness: 0.7
     });
-    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-    floor.rotation.x = -Math.PI / 2;
-    floor.position.y = 0.1;
-    floor.receiveShadow = true;
-    scene.add(floor);
+    const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+    plane.rotation.x = -Math.PI / 2;
+    plane.position.y = 0;
+    plane.receiveShadow = true;
+    scene.add(plane);
+    console.log('Płaszczyzna z logo została dodana');
+}, undefined, (error) => {
+    console.error('Błąd ładowania tekstury:', error);
 });
 
-// Oświetlenie
-const ambientLight = new THREE.AmbientLight(0x00ff88, 0.3); // Subtelna zieleń
+// Oświetlenie (BEZ ZIELONEJ POŚWIATY)
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
-const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
 directionalLight.position.set(5, 10, 7);
 directionalLight.castShadow = true;
 scene.add(directionalLight);
@@ -59,29 +62,32 @@ loader.load('public/millennium_falcon/dron.glb', (gltf) => {
     model.scale.set(5, 5, 5);
     model.position.y = 5;
     
-    // Lekka zielona poświata
+    // USUNIĘTE: wszystkie efekty emisji i zielonej poświaty
     model.traverse((child) => {
         if (child.isMesh) {
             child.castShadow = true;
-            child.material.emissive = new THREE.Color(0x003300);
-            child.material.emissiveIntensity = 0.1;
+            child.receiveShadow = true;
         }
     });
     
     scene.add(model);
     document.getElementById('progress-container').style.display = 'none';
+}, undefined, (error) => {
+    console.error('Błąd ładowania modelu:', error);
 });
 
-// Obsługa myszy
+// Obsługa myszy (TYLKO LPM)
 sceneContainer.addEventListener('mousedown', (e) => {
-    if (e.button === 0) { // Tylko LPM
+    if (e.button === 0) { // Tylko lewy przycisk myszy
         isDragging = true;
         previousMousePosition = { x: e.clientX, y: e.clientY };
+        sceneContainer.style.cursor = 'grabbing';
     }
 });
 
 window.addEventListener('mouseup', () => {
     isDragging = false;
+    sceneContainer.style.cursor = 'grab';
 });
 
 window.addEventListener('mousemove', (e) => {
@@ -92,9 +98,9 @@ window.addEventListener('mousemove', (e) => {
         y: e.clientY - previousMousePosition.y
     };
     
-    camera.position.x -= deltaMove.x * 0.01;
-    camera.position.y += deltaMove.y * 0.01;
-    camera.lookAt(0, 3, 0);
+    camera.position.x -= deltaMove.x * 0.05;
+    camera.position.y += deltaMove.y * 0.05;
+    camera.lookAt(0, 5, 0); // Patrzymy na środek (na wysokości drona)
     
     previousMousePosition = { x: e.clientX, y: e.clientY };
 });
@@ -102,11 +108,12 @@ window.addEventListener('mousemove', (e) => {
 // Przybliżanie scroll-em
 sceneContainer.addEventListener('wheel', (e) => {
     e.preventDefault();
-    zoomLevel -= e.deltaY * 0.05;
+    zoomLevel -= e.deltaY * zoomSpeed;
     zoomLevel = Math.min(Math.max(zoomLevel, minZoom), maxZoom);
     
-    const direction = camera.position.clone().normalize();
-    camera.position.copy(direction.multiplyScalar(zoomLevel));
+    const direction = new THREE.Vector3();
+    camera.getWorldDirection(direction);
+    camera.position.add(direction.multiplyScalar(-e.deltaY * zoomSpeed));
 });
 
 // Animacja
