@@ -3,16 +3,17 @@ import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 // Inicjalizacja sceny z optymalizacjami mobilnymi
 const sceneContainer = document.getElementById('scene-container');
-const renderer = new THREE.WebGLRenderer({ 
+const renderer = new THREE.WebGLRenderer({
     antialias: true,
-    powerPreference: 'high-performance', // Optymalizacja wydajności
-    preserveDrawingBuffer: true // Dla kompatybilności z niektórymi urządzeniami
+    powerPreference: "high-performance",
+    preserveDrawingBuffer: true,
+    alpha: true // Dodaj tę linię
 });
 
 // Ustawienie pixel ratio odpowiedniego dla urządzenia
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Ograniczenie do max 2x
 renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
-renderer.setClearColor(0x000000);
+renderer.setClearColor(0x000000, 1);
 renderer.shadowMap.enabled = true;
 renderer.outputColorSpace = THREE.SRGBColorSpace; // Lepsze kolory na mobilnych
 sceneContainer.appendChild(renderer.domElement);
