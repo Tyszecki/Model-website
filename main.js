@@ -36,17 +36,21 @@ controls.autoRotate = false;
 controls.target = new THREE.Vector3(0, 1, 0);
 controls.update();
 
-// Dodaj płaszczyznę z teksturą logo
+// Dodaj płaszczyznę z teksturą logo (znacznie niżej)
 const textureLoader = new THREE.TextureLoader();
-textureLoader.load('public/logo_shad_bckg.png', function(texture) {
-    const planeGeometry = new THREE.PlaneGeometry(20, 20);
+textureLoader.load('images/logo_shad_bckg.png', function(texture) {
+    const planeGeometry = new THREE.PlaneGeometry(30, 30); // Nieco większa płaszczyzna
     const planeMaterial = new THREE.MeshStandardMaterial({ 
         map: texture,
-        side: THREE.DoubleSide
+        side: THREE.DoubleSide,
+        transparent: true,
+        opacity: 0.9,
+        roughness: 0.7,
+        metalness: 0.1
     });
     const plane = new THREE.Mesh(planeGeometry, planeMaterial);
     plane.rotation.x = -Math.PI / 2;
-    plane.position.y = -0.5;
+    plane.position.y = -20; // Bardzo nisko - jak w logo Batmana
     plane.receiveShadow = true;
     scene.add(plane);
 });
