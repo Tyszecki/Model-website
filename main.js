@@ -8,92 +8,110 @@ const renderer = new THREE.WebGLRenderer({
     powerPreference: "high-performance"
 });
 renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
-renderer.setClearColor(0x000000); // Czarne tło
+renderer.setClearColor(0x000000);
 renderer.shadowMap.enabled = true;
-renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 sceneContainer.appendChild(renderer.domElement);
 
 const scene = new THREE.Scene();
-scene.fog = new THREE.FogExp2(0x00ff00, 0.002); // Zielona mgiełka
 
 // Kamera
 const camera = new THREE.PerspectiveCamera(45, sceneContainer.clientWidth / sceneContainer.clientHeight, 0.1, 1000);
 camera.position.set(0, 5, 20);
 
-// Kontrola ruchu kamery
-const mouse = new THREE.Vector2();
-const targetRotation = { x: 0, y: 0 };
-const currentRotation = { x: 0, y: 0 };
-const sensitivity = 0.005;
-const radius = 20;
+// Kontrola kamery
+let isDragging = false;
+let previousMousePosition = { x: 0, y: 0 };
+let zoomLevel = 20;
+const minZoom = 5;
+const maxZoom = 50;
 
-// Obsługa myszy
-function onMouseMove(event) {
-    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
-    
-    targetRotation.x = mouse.y * Math.PI * 0.25;
-    targetRotation.y = mouse.x * Math.PI;
-}
-
-window.addEventListener('mousemove', onMouseMove, false);
-
-// Efekt zielonej poświaty
-const greenGlow = new THREE.AmbientLight(0x00ff88, 0.5);
-scene.add(greenGlow);
-
-const spotLight = new THREE.SpotLight(0x00ffaa, 2, 100, Math.PI/4, 1);
-spotLight.position.set(0, 15, 10);
-spotLight.castShadow = true;
-spotLight.shadow.mapSize.width = 1024;
-spotLight.shadow.mapSize.height = 1024;
-scene.add(spotLight);
-
-// Płaszczyzna podłogi z zielonym odbiciem
-const floorGeometry = new THREE.PlaneGeometry(100, 100);
-const floorMaterial = new THREE.MeshStandardMaterial({ 
-    color: 0x111111,
-    metalness: 0.9,
-    roughness: 0.1,
-    envMapIntensity: 1
+// Płaszczyzna podłogi z logo
+const textureLoader = new THREE.TextureLoader();
+textureLoader.load('public/logo_shad_bckg.png', (texture) => {
+    const floorGeometry = new THREE.PlaneGeometry(30, 30);
+    const floorMaterial = new THREE.MeshStandardMaterial({
+        map: texture,
+        transparent: true,
+        opacity: 0.8,
+        metalness: 0.3,
+        roughness: 0.7
+    });
+    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    floor.rotation.x = -Math.PI / 2;
+    floor.position.y = 0.1;
+    floor.receiveShadow = true;
+    scene.add(floor);
 });
-const floor = new THREE.Mesh(floorGeometry, floorMaterial);
-floor.rotation.x = -Math.PI / 2;
-floor.receiveShadow = true;
-scene.add(floor);
 
-// Ładowanie modelu drona
+// Oświetlenie
+const ambientLight = new THREE.AmbientLight(0x00ff88, 0.3); // Subtelna zieleń
+scene.add(ambientLight);
+
+const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+directionalLight.position.set(5, 10, 7);
+directionalLight.castShadow = true;
+scene.add(directionalLight);
+
+// Ładowanie modelu
 const loader = new GLTFLoader();
 loader.load('public/millennium_falcon/dron.glb', (gltf) => {
     const model = gltf.scene;
     model.scale.set(5, 5, 5);
-    model.position.y = 3;
+    model.position.y = 5;
+    
+    // Lekka zielona poświata
     model.traverse((child) => {
         if (child.isMesh) {
             child.castShadow = true;
-            child.receiveShadow = true;
             child.material.emissive = new THREE.Color(0x003300);
-            child.material.emissiveIntensity = 0.3;
+            child.material.emissiveIntensity = 0.1;
         }
     });
+    
     scene.add(model);
     document.getElementById('progress-container').style.display = 'none';
+});
+
+// Obsługa myszy
+sceneContainer.addEventListener('mousedown', (e) => {
+    if (e.button === 0) { // Tylko LPM
+        isDragging = true;
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+    }
+});
+
+window.addEventListener('mouseup', () => {
+    isDragging = false;
+});
+
+window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    
+    const deltaMove = {
+        x: e.clientX - previousMousePosition.x,
+        y: e.clientY - previousMousePosition.y
+    };
+    
+    camera.position.x -= deltaMove.x * 0.01;
+    camera.position.y += deltaMove.y * 0.01;
+    camera.lookAt(0, 3, 0);
+    
+    previousMousePosition = { x: e.clientX, y: e.clientY };
+});
+
+// Przybliżanie scroll-em
+sceneContainer.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    zoomLevel -= e.deltaY * 0.05;
+    zoomLevel = Math.min(Math.max(zoomLevel, minZoom), maxZoom);
+    
+    const direction = camera.position.clone().normalize();
+    camera.position.copy(direction.multiplyScalar(zoomLevel));
 });
 
 // Animacja
 function animate() {
     requestAnimationFrame(animate);
-    
-    // Płynne śledzenie kursora
-    currentRotation.x += (targetRotation.x - currentRotation.x) * 0.1;
-    currentRotation.y += (targetRotation.y - currentRotation.y) * 0.1;
-    
-    camera.position.x = radius * Math.sin(currentRotation.y) * Math.cos(currentRotation.x);
-    camera.position.y = radius * Math.sin(currentRotation.x);
-    camera.position.z = radius * Math.cos(currentRotation.y) * Math.cos(currentRotation.x);
-    
-    camera.lookAt(0, 3, 0);
-    
     renderer.render(scene, camera);
 }
 
