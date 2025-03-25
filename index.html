@@ -39,21 +39,25 @@
         background-color: #f0f0f0;
       }
 
-      /* Stylizacja przycisku w prawym górnym rogu */
+      /* ZAKTUALIZOWANA STYLIZACJA PRZYCISKU - TERAZ W PRAWYM DOLNYM ROGU */
       .back-button {
         position: fixed;
-        top: 20px;
+        bottom: 20px;
         right: 20px;
         background-color: white;
         color: black;
         border: 2px solid black;
-        padding: 10px 20px;
+        padding: 12px 24px;
         font-size: 16px;
+        font-weight: bold;
         display: flex;
         align-items: center;
         cursor: pointer;
         text-decoration: none;
-        z-index: 1000; /* Upewnij się, że przycisk jest na wierzchu */
+        z-index: 1000;
+        border-radius: 5px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        transition: all 0.2s ease;
       }
 
       .back-button i {
@@ -61,27 +65,38 @@
         font-size: 20px;
       }
 
+      .back-button:hover {
+        background-color: black;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+      }
+
+      .back-button:active {
+        transform: translateY(0);
+      }
+
       /* Stylizacja nagłówka */
       #heading {
         position: fixed;
         top: 20px;
         left: 20px;
-        z-index: 1000; /* Upewnij się, że nagłówek jest na wierzchu */
+        z-index: 1000;
         background-color: rgba(255, 255, 255, 0.8);
         padding: 10px;
         border-radius: 5px;
       }
 
-#heading h1 {
-  color: black; /* Kolor tekstu */
-  margin: 0; /* Usunięcie domyślnych marginesów */
-  padding: 10px; /* Dodanie paddingu, aby tekst nie stykał się z ramką */
-  font-size: 24px; /* Rozmiar czcionki */
-  font-weight: bold; /* Pogrubienie tekstu */
-  border: 2px solid black; /* Czarna ramka o grubości 2px */
-  border-radius: 5px; /* Zaokrąglenie rogów ramki */
-  display: inline-block; /* Ramka dopasowana do rozmiaru tekstu */
-}
+      #heading h1 {
+        color: black;
+        margin: 0;
+        padding: 10px;
+        font-size: 24px;
+        font-weight: bold;
+        border: 2px solid black;
+        border-radius: 5px;
+        display: inline-block;
+      }
 
       /* Stylizacja kontenera postępu ładowania */
       #progress-container {
@@ -95,7 +110,7 @@
         background-color: rgba(0, 0, 0, 0.7);
         padding: 10px 20px;
         border-radius: 5px;
-        z-index: 1000; /* Upewnij się, że kontener jest na wierzchu */
+        z-index: 1000;
       }
     </style>
   </head>
@@ -114,7 +129,7 @@
     <!-- Kontener dla sceny Three.js -->
     <div id="scene-container"></div>
 
-    <!-- Przycisk Powrót w prawym górnym rogu -->
+    <!-- Przycisk Powrót w prawym DOLNYM rogu -->
     <a href="https://tyszecki.github.io/SHAD-WEBSITE/index.html#" class="back-button">
       <i class="fas fa-arrow-left"></i> Powrót
     </a>
