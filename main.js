@@ -20,16 +20,16 @@ camera.position.set(0, 10, 30);
 // Kontrola kamery
 let isDragging = false;
 let previousMousePosition = { x: 0, y: 0 };
-const zoomSpeed = 0.1;
+const zoomSpeed = 0.02; // Zmniejszona prędkość zoomu
 let zoomLevel = 30;
 const minZoom = 10;
 const maxZoom = 50;
 
-// Płaszczyzna podłogi z logo (TERAZ WIDOCZNA)
+// Płaszczyzna podłogi z logo - POMNIEJSZONA 6x
 const textureLoader = new THREE.TextureLoader();
 textureLoader.load('public/logo_shad_bckg.png', (texture) => {
     texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
-    const planeGeometry = new THREE.PlaneGeometry(30, 30);
+    const planeGeometry = new THREE.PlaneGeometry(5, 5); // Zmienione z 30,30 na 5,5 (6x mniejsza)
     const planeMaterial = new THREE.MeshStandardMaterial({
         map: texture,
         side: THREE.DoubleSide,
@@ -41,12 +41,12 @@ textureLoader.load('public/logo_shad_bckg.png', (texture) => {
     plane.position.y = 0;
     plane.receiveShadow = true;
     scene.add(plane);
-    console.log('Płaszczyzna z logo została dodana');
+    console.log('Pomniejszona płaszczyzna z logo została dodana');
 }, undefined, (error) => {
     console.error('Błąd ładowania tekstury:', error);
 });
 
-// Oświetlenie (BEZ ZIELONEJ POŚWIATY)
+// Oświetlenie
 const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
 scene.add(ambientLight);
 
@@ -62,7 +62,6 @@ loader.load('public/millennium_falcon/dron.glb', (gltf) => {
     model.scale.set(5, 5, 5);
     model.position.y = 5;
     
-    // USUNIĘTE: wszystkie efekty emisji i zielonej poświaty
     model.traverse((child) => {
         if (child.isMesh) {
             child.castShadow = true;
@@ -76,9 +75,9 @@ loader.load('public/millennium_falcon/dron.glb', (gltf) => {
     console.error('Błąd ładowania modelu:', error);
 });
 
-// Obsługa myszy (TYLKO LPM)
+// Obsługa myszy
 sceneContainer.addEventListener('mousedown', (e) => {
-    if (e.button === 0) { // Tylko lewy przycisk myszy
+    if (e.button === 0) {
         isDragging = true;
         previousMousePosition = { x: e.clientX, y: e.clientY };
         sceneContainer.style.cursor = 'grabbing';
@@ -100,12 +99,12 @@ window.addEventListener('mousemove', (e) => {
     
     camera.position.x -= deltaMove.x * 0.05;
     camera.position.y += deltaMove.y * 0.05;
-    camera.lookAt(0, 5, 0); // Patrzymy na środek (na wysokości drona)
+    camera.lookAt(0, 5, 0);
     
     previousMousePosition = { x: e.clientX, y: e.clientY };
 });
 
-// Przybliżanie scroll-em
+// Zmodyfikowany zoom - mniejsze skoki
 sceneContainer.addEventListener('wheel', (e) => {
     e.preventDefault();
     zoomLevel -= e.deltaY * zoomSpeed;
@@ -113,7 +112,7 @@ sceneContainer.addEventListener('wheel', (e) => {
     
     const direction = new THREE.Vector3();
     camera.getWorldDirection(direction);
-    camera.position.add(direction.multiplyScalar(-e.deltaY * zoomSpeed));
+    camera.position.add(direction.multiplyScalar(-e.deltaY * zoomSpeed * 0.3)); // Dodatkowe zmniejszenie efektu
 });
 
 // Animacja
