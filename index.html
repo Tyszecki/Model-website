@@ -1,125 +1,350 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
+<html lang="pl">
+<head>
     <meta charset="utf-8">
-    <title>BSP SHAD</title>
+    <title>BSP SHAD - Model 3D</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
-    <link rel="stylesheet" href="public/index.css">
-
-    <script async src="https://unpkg.com/es-module-shims@1.6.3/dist/es-module-shims.js"></script>
-    <script type="importmap">
-      {
-        "imports": {
-          "three": "https://unpkg.com/three@v0.163.0/build/three.module.js",
-          "three/addons/": "https://unpkg.com/three@v0.163.0/examples/jsm/"
-        }
-      }
-    </script>
-
-    <!-- Dodanie FontAwesome dla ikon -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Preload resources -->
+    <link rel="preload" href="https://unpkg.com/three@0.163.0/build/three.module.js" as="script" crossorigin>
+    <link rel="preload" href="https://unpkg.com/three@0.163.0/examples/jsm/loaders/GLTFLoader.js" as="script" crossorigin>
 
     <style>
-      /* Reset marginesów i paddingu */
-      html, body {
-        margin: 0;
-        padding: 0;
-        overflow: hidden; /* Wyłącz przesuwanie strony */
-        width: 100%;
-        height: 100%;
-      }
-
-      /* Stylizacja kontenera dla sceny Three.js */
-      #scene-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-color: #f0f0f0;
-      }
-
-      /* Stylizacja przycisku w prawym górnym rogu */
-      .back-button {
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background-color: white;
-        color: black;
-        border: 2px solid black;
-        padding: 10px 20px;
-        font-size: 16px;
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        text-decoration: none;
-        z-index: 1000; /* Upewnij się, że przycisk jest na wierzchu */
-      }
-
-      .back-button i {
-        margin-right: 10px;
-        font-size: 20px;
-      }
-
-      /* Stylizacja nagłówka */
-      #heading {
-        position: fixed;
-        top: 20px;
-        left: 20px;
-        z-index: 1000; /* Upewnij się, że nagłówek jest na wierzchu */
-        background-color: rgba(255, 255, 255, 0.8);
-        padding: 10px;
-        border-radius: 5px;
-      }
-
-#heading h1 {
-  color: black; /* Kolor tekstu */
-  margin: 0; /* Usunięcie domyślnych marginesów */
-  padding: 10px; /* Dodanie paddingu, aby tekst nie stykał się z ramką */
-  font-size: 24px; /* Rozmiar czcionki */
-  font-weight: bold; /* Pogrubienie tekstu */
-  border: 2px solid black; /* Czarna ramka o grubości 2px */
-  border-radius: 5px; /* Zaokrąglenie rogów ramki */
-  display: inline-block; /* Ramka dopasowana do rozmiaru tekstu */
-}
-
-      /* Stylizacja kontenera postępu ładowania */
-      #progress-container {
-        position: fixed;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        font-family: Arial, sans-serif;
-        font-size: 18px;
-        color: white;
-        background-color: rgba(0, 0, 0, 0.7);
-        padding: 10px 20px;
-        border-radius: 5px;
-        z-index: 1000; /* Upewnij się, że kontener jest na wierzchu */
-      }
+        /* Critical CSS - inlined for immediate rendering */
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            -webkit-tap-highlight-color: transparent;
+            -webkit-text-size-adjust: 100%;
+            touch-action: manipulation;
+        }
+        
+        #scene-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+        }
+        
+        .back-button {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: rgba(255,255,255,0.9);
+            color: #000;
+            border: 2px solid #000;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 5px;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            transition: all 0.2s ease;
+        }
+        
+        .back-button:hover {
+            background-color: #000;
+            color: #fff;
+        }
+        
+        #progress-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            background-color: rgba(0,0,0,0.7);
+            padding: 15px 30px;
+            border-radius: 5px;
+            z-index: 1000;
+            font-family: Arial, sans-serif;
+            text-align: center;
+        }
+        
+        /* Mobile optimizations */
+        @media (max-width: 768px) {
+            .back-button {
+                padding: 10px 20px;
+                font-size: 14px;
+                bottom: 15px;
+                right: 15px;
+            }
+        }
     </style>
-  </head>
-  <body>
-    <!-- Nagłówek -->
-    <div id="heading">
-      <h1>BSP SHAD</h1>
-      <div class="border"></div>
-    </div>
-
-    <!-- Kontener postępu ładowania -->
+</head>
+<body>
+    <!-- Progress indicator -->
     <div id="progress-container">
-      <div id="progress">Przygotuj się do lotu...</div>
+        <div id="progress">Ładowanie modelu...</div>
     </div>
 
-    <!-- Kontener dla sceny Three.js -->
+    <!-- 3D Scene Container -->
     <div id="scene-container"></div>
 
-    <!-- Przycisk Powrót w prawym górnym rogu -->
+    <!-- Back button -->
     <a href="https://tyszecki.github.io/SHAD-WEBSITE/index.html#" class="back-button">
-      <i class="fas fa-arrow-left"></i> Powrót
+        <i class="fas fa-arrow-left"></i> Powrót
     </a>
 
-    <!-- Skrypt główny -->
-    <script type="module" src="./main.js"></script>
-  </body>
+    <!-- Import map for Three.js -->
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://unpkg.com/three@0.163.0/build/three.module.js",
+                "three/addons/": "https://unpkg.com/three@0.163.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <!-- Load FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <!-- Main script (loaded as module) -->
+    <script type="module">
+        import * as THREE from 'three';
+        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+        // Initialize scene
+        const sceneContainer = document.getElementById('scene-container');
+        const renderer = new THREE.WebGLRenderer({ 
+            antialias: true,
+            powerPreference: "high-performance"
+        });
+        
+        // Mobile-optimized renderer settings
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
+        renderer.setClearColor(0x000000);
+        renderer.shadowMap.enabled = true;
+        renderer.outputColorSpace = THREE.SRGBColorSpace;
+        sceneContainer.appendChild(renderer.domElement);
+
+        const scene = new THREE.Scene();
+
+        // Camera setup
+        const camera = new THREE.PerspectiveCamera(
+            45, 
+            sceneContainer.clientWidth / sceneContainer.clientHeight, 
+            0.1, 
+            1000
+        );
+        camera.position.set(0, 10, 30);
+
+        // Mobile-optimized controls
+        let isDragging = false;
+        let previousTouchPosition = { x: 0, y: 0 };
+        const zoomSpeed = 0.02;
+        let zoomLevel = 30;
+        const minZoom = 10;
+        const maxZoom = 50;
+
+        // Floor plane with logo
+        const textureLoader = new THREE.TextureLoader();
+        textureLoader.load('public/logo_shad_bckg.png', (texture) => {
+            texture.anisotropy = renderer.capabilities.getMaxAnisotropy();
+            const planeGeometry = new THREE.PlaneGeometry(5, 5);
+            const planeMaterial = new THREE.MeshStandardMaterial({
+                map: texture,
+                side: THREE.DoubleSide,
+                metalness: 0.3,
+                roughness: 0.7
+            });
+            const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+            plane.rotation.x = -Math.PI / 2;
+            plane.position.y = 0;
+            plane.receiveShadow = true;
+            scene.add(plane);
+        });
+
+        // Lighting optimized for mobile performance
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+        scene.add(ambientLight);
+
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
+        directionalLight.position.set(5, 10, 7);
+        directionalLight.castShadow = true;
+        directionalLight.shadow.mapSize.width = 1024;
+        directionalLight.shadow.mapSize.height = 1024;
+        scene.add(directionalLight);
+
+        // Under plane lighting
+        const underLight = new THREE.PointLight(0xffffff, 1, 10);
+        underLight.position.set(0, -2, 0);
+        underLight.castShadow = true;
+        scene.add(underLight);
+
+        // Load 3D model with progress tracking
+        const loader = new GLTFLoader();
+        loader.load(
+            'public/millennium_falcon/dron.glb',
+            (gltf) => {
+                const model = gltf.scene;
+                model.scale.set(5, 5, 5);
+                model.position.y = 5;
+                
+                model.traverse((child) => {
+                    if (child.isMesh) {
+                        child.castShadow = true;
+                        child.receiveShadow = true;
+                    }
+                });
+                
+                scene.add(model);
+                document.getElementById('progress-container').style.display = 'none';
+            },
+            (xhr) => {
+                const percent = (xhr.loaded / xhr.total * 100).toFixed(0);
+                document.getElementById('progress').textContent = `Ładowanie modelu... ${percent}%`;
+            },
+            (error) => {
+                console.error('Błąd ładowania modelu:', error);
+                document.getElementById('progress').textContent = 'Błąd ładowania modelu';
+            }
+        );
+
+        // Touch events for mobile
+        sceneContainer.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                previousTouchPosition = {
+                    x: e.touches[0].clientX,
+                    y: e.touches[0].clientY
+                };
+                sceneContainer.style.cursor = 'grabbing';
+                e.preventDefault();
+            }
+        });
+
+        window.addEventListener('touchend', () => {
+            isDragging = false;
+            sceneContainer.style.cursor = 'grab';
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging || e.touches.length !== 1) return;
+            
+            const deltaMove = {
+                x: e.touches[0].clientX - previousTouchPosition.x,
+                y: e.touches[0].clientY - previousTouchPosition.y
+            };
+            
+            camera.position.x -= deltaMove.x * 0.05;
+            camera.position.y += deltaMove.y * 0.05;
+            camera.lookAt(0, 5, 0);
+            
+            previousTouchPosition = {
+                x: e.touches[0].clientX,
+                y: e.touches[0].clientY
+            };
+            
+            e.preventDefault();
+        });
+
+        // Pinch-to-zoom gesture
+        let initialDistance = 0;
+        sceneContainer.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 2) {
+                initialDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                e.preventDefault();
+            }
+        });
+
+        sceneContainer.addEventListener('touchmove', (e) => {
+            if (e.touches.length === 2) {
+                const currentDistance = Math.hypot(
+                    e.touches[0].clientX - e.touches[1].clientX,
+                    e.touches[0].clientY - e.touches[1].clientY
+                );
+                
+                const delta = initialDistance - currentDistance;
+                zoomLevel += delta * 0.1;
+                zoomLevel = Math.min(Math.max(zoomLevel, minZoom), maxZoom);
+                
+                const direction = new THREE.Vector3();
+                camera.getWorldDirection(direction);
+                camera.position.add(direction.multiplyScalar(delta * 0.01));
+                
+                initialDistance = currentDistance;
+                e.preventDefault();
+            }
+        });
+
+        // Mouse events (for desktop)
+        sceneContainer.addEventListener('mousedown', (e) => {
+            if (e.button === 0) {
+                isDragging = true;
+                previousTouchPosition = { x: e.clientX, y: e.clientY };
+                sceneContainer.style.cursor = 'grabbing';
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+            sceneContainer.style.cursor = 'grab';
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            
+            const deltaMove = {
+                x: e.clientX - previousTouchPosition.x,
+                y: e.clientY - previousTouchPosition.y
+            };
+            
+            camera.position.x -= deltaMove.x * 0.05;
+            camera.position.y += deltaMove.y * 0.05;
+            camera.lookAt(0, 5, 0);
+            
+            previousTouchPosition = { x: e.clientX, y: e.clientY };
+        });
+
+        // Zoom with wheel
+        sceneContainer.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            zoomLevel -= e.deltaY * zoomSpeed;
+            zoomLevel = Math.min(Math.max(zoomLevel, minZoom), maxZoom);
+            
+            const direction = new THREE.Vector3();
+            camera.getWorldDirection(direction);
+            camera.position.add(direction.multiplyScalar(-e.deltaY * zoomSpeed * 0.3));
+        }, { passive: false });
+
+        // Animation loop
+        function animate() {
+            requestAnimationFrame(animate);
+            renderer.render(scene, camera);
+        }
+
+        // Handle resize
+        function onWindowResize() {
+            camera.aspect = sceneContainer.clientWidth / sceneContainer.clientHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(sceneContainer.clientWidth, sceneContainer.clientHeight);
+        }
+
+        // Throttled resize handler
+        let resizeTimeout;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimeout);
+            resizeTimeout = setTimeout(() => {
+                onWindowResize();
+            }, 100);
+        });
+
+        // Start animation
+        animate();
+    </script>
+</body>
 </html>
